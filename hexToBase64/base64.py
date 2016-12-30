@@ -18,9 +18,28 @@ def to_int(hex_char):
     return dic[hex_char]
 
 
+# TODO: refactor to_hex and to_base64 to base function with error handling
+def to_hex(int_value):
+    """
+    Uses dictionary to do conversion for each digit
+    :param int_value:
+    :return:
+    """
+    dic = {i: '%s' % i for i in range(10)}
+    dic_a_to_f = {num: chr(num + 87) for num in range(10, 16)}
+    dic.update(dic_a_to_f)
+
+    mod = int_value % 16
+    dividend = int_value >> 4
+    last_digit = dic[mod]
+    if dividend == 0:
+        return last_digit
+    return to_hex(dividend) + last_digit
+
+
 def to_base64(int_value):
     """
-    Uses a dictionary to
+    Uses a dictionary to do conversion for each digit
     :param int_value: {int} arbitrary integer value in base 10
     :return: {str} value in base 64
     """
@@ -63,3 +82,18 @@ def hex_str_to_base_64_str(hex_str):
     if len(hex_str) == 0:
         return ''
     return hex_str_to_base_64_str(hex_str[:-3]) + hex_to_base64(hex_str[-3:])
+
+
+def xor_hex_strs(hex_str1, hex_str2):
+    """
+    converts both hex_strs to int and do a bitwise int operations
+    A XOR B = ~((A & B) | ~(A | B))
+    :param hex_str1: {str}
+    :param hex_str2: {str}
+    :return: {str} XOR of the two hex_str, as a hex_str
+    """
+    int1 = int(hex_str1, 16)
+    int2 = int(hex_str2, 16)
+    int_and = int1 & int2
+    int_neither = ~(int1 | int2)
+    return to_hex(~(int_and | int_neither))
